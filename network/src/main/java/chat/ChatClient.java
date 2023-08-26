@@ -42,7 +42,7 @@ public class ChatClient {
 			}
 			
 			pw.println("join: " + nickname);
-//			pw.flush();
+
 			
 			//ack 받기!!
 			String ack = br.readLine();
