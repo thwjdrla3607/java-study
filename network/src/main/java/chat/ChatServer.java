@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class ChatServer {
 			
 			// 2. 바인딩
 			String hostAddress = InetAddress.getLocalHost().getHostAddress();
-			serverSocket.bind(new InetSocketAddress("0.0.0.0", PORT), 10);
+			serverSocket.bind(new InetSocketAddress("127.0.0.1", PORT), 10);
 			log("연결 기다림" + hostAddress + ":" + PORT);
 			
 			// 3. 요청 대기
@@ -33,15 +34,18 @@ public class ChatServer {
 				new ChatServerThread(socket, listPrintWriter).start();
 			}
 			
-		} catch(IOException e) {
-			log("Error : " + e);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
+			// 자원 정리 
 			try {
 				if(serverSocket != null && !serverSocket.isClosed()) {
 					serverSocket.close();
 				}
-			} catch(IOException e) {
-				e.printStackTrace();
+			} catch (IOException e) {
+				log("error: " + e);
 			}
 		}
 	}

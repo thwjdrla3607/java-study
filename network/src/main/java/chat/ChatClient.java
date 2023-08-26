@@ -26,7 +26,7 @@ public class ChatClient {
 			
 			// 3. 연결
 			socket.connect(new InetSocketAddress(SERVER_IP, ChatServer.PORT));
-			log("연결 성공");
+			log("connected");
 			
 			// 4. reader/writer 생성
 			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
@@ -53,7 +53,7 @@ public class ChatClient {
 				String input = s.nextLine();
 				
 				if(!s.hasNextLine()) {
-					// 공백
+					// 공백처리
 					continue;
 				}
 				
@@ -67,18 +67,20 @@ public class ChatClient {
 				}
 			}
 			
-		} catch(Exception e) {
-			log("Error : " + e);
+		} catch (ConnectException e) {
+			log("서버[" + SERVER_IP + ":" + ChatServer.PORT + "]에 연결할 수 없습니다.");	
+		} catch (Exception e) {
+			log(e + " 프로그램 종료");	
 		} finally {
 			try {
 				if(s != null) {
 					s.close();
 				}
-				if( socket != null && !socket.isClosed()) {
+				if(socket != null && socket.isClosed() == false){
 					socket.close();
 				}
-			} catch(IOException e) {
-				log("Error : " + e);
+			}catch(IOException e) {
+				log(e + " 프로그램 종료");	
 			}
 		}
 	}
