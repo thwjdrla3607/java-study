@@ -30,11 +30,17 @@ public class ChatClient {
 			
 			// 4. reader/writer 생성
 			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-			PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
+			PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"), true);
 			
 			// 5. join 프로토콜
+			System.out.println("채팅 프로그램입니다. 사용하실 닉네임을 입력하세요.");
 			System.out.print("닉네임>> ");
 			String nickname = s.nextLine();
+			
+			if(nickname.equals("")) {
+				nickname = "익명" ;
+			}
+			
 			pw.println("join: " + nickname);
 //			pw.flush();
 			

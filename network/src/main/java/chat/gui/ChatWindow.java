@@ -12,6 +12,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketException;
 
 public class ChatWindow {
 
@@ -21,7 +28,16 @@ public class ChatWindow {
 	private TextField textField;
 	private TextArea textArea;
 
-	public ChatWindow(String name) {
+	private Socket socket;
+	private String name;
+	
+	private BufferedReader br;
+	private PrintWriter pw;
+	
+	public ChatWindow(String name, Socket socket) {
+		this.socket = socket;
+		this.name = name;
+		
 		frame = new Frame(name);
 		pannel = new Panel();
 		buttonSend = new Button("Send");
@@ -72,19 +88,37 @@ public class ChatWindow {
 		frame.pack();
 		
 		// IOStream 받아오기
-		// ChatClientThread 생성하고 실행
+		try {
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true); // auto-flush
+			
+			// ChatClientThread 생성하고 실행
+			new ChatClientThread().start();
+		} catch(IOException e) {
+			ChatClientApp.log("error: " + e);
+		}
 	}
 	
 	private void finish() {
-		// quit 프로토콜 구현
-		
-		
-		// exit java(JVM)
-		System.exit(0);
+		try {
+			// quit 프로토콜 구현 
+			// exit java(JVM) 
+			if(socket != null && !socket.isClosed()) {
+				socket.close();
+			}
+			System.out.println("채팅창 종료");
+			System.exit(0);
+		} catch (IOException e) {
+			ChatClientApp.log("error : " + e);
+		}
 	}
 	
 	private void sendMessage() {
 		String message = textField.getText();
+		if(message != null) {
+			pw.println("message:" + message);
+			System.out.println("메시지 : " + message);
+		}
 		System.out.println("메세지를 보내는 프로코톨 구현:" + message);
 		
 		textField.setText("");
@@ -95,14 +129,49 @@ public class ChatWindow {
 	}
 	
 	private void updateTextArea(String message) {
-		textArea.append(message);
-		textArea.append("\n");
+		if(message.contains(":")) { 
+			String[] tokens = message.split(":");
+			
+			String nickname = tokens[0];
+			String content = tokens[1];
+			
+			
+			if(nickname.equals(name)) { 
+				message = "[나] " + content; 
+				message = "\t\t   " + message;
+			} else { 
+				message = "[" + nickname + "] " + content;
+			}
+			
+			textArea.append(message);
+			textArea.append("\n");
+		} else { 
+			textArea.append(message);
+			textArea.append("\n\n");
+		}
 	}
 	
 	private class ChatClientThread extends Thread {
 		@Override
 		public void run() {
-			updateTextArea("마이콜: 안녕~");
+			try {
+				while(true) {
+					String data = br.readLine(); 
+					if(data == null) { 
+						break;
+					}
+						
+					Thread.sleep(1);  
+					updateTextArea(data);
+				}
+			} catch (InterruptedException e) { 
+			} catch (SocketException e) {
+				ChatClientApp.log("error: " + e);
+			} catch (IOException e) {
+				ChatClientApp.log("error: " + e);
+			} finally {
+				finish();  
+			}
 		}
 	}
 }

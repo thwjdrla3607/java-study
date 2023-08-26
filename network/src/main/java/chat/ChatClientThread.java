@@ -26,7 +26,7 @@ public class ChatClientThread extends Thread {
 		        System.out.println(msg);
 			}
 		} catch(SocketException e){
-			ChatClient.log("" + e);	
+			ChatClient.log("error: " + e);	
 		} catch(IOException e){
 			ChatClient.log(e + " 프로그램 종료");	
 		} finally {
