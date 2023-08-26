@@ -29,14 +29,12 @@ public class ChatWindow {
 	private TextArea textArea;
 
 	private Socket socket;
-	private String name;
 	
 	private BufferedReader br;
 	private PrintWriter pw;
 	
 	public ChatWindow(String name, Socket socket) {
 		this.socket = socket;
-		this.name = name;
 		
 		frame = new Frame(name);
 		pannel = new Panel();
@@ -106,7 +104,7 @@ public class ChatWindow {
 			if(socket != null && !socket.isClosed()) {
 				socket.close();
 			}
-			System.out.println("채팅창 종료");
+			System.out.println("CLOSE");
 			System.exit(0);
 		} catch (IOException e) {
 			ChatClientApp.log("error : " + e);
@@ -123,32 +121,11 @@ public class ChatWindow {
 		
 		textField.setText("");
 		textField.requestFocus();
-		
-		// ChatClientThread 에서 서버로 부터 받은 메세지가 있다고 치고~~
-		updateTextArea("마이콜: " + message);
 	}
 	
 	private void updateTextArea(String message) {
-		if(message.contains(":")) { 
-			String[] tokens = message.split(":");
-			
-			String nickname = tokens[0];
-			String content = tokens[1];
-			
-			
-			if(nickname.equals(name)) { 
-				message = "[나] " + content; 
-				message = "\t\t   " + message;
-			} else { 
-				message = "[" + nickname + "] " + content;
-			}
-			
-			textArea.append(message);
-			textArea.append("\n");
-		} else { 
-			textArea.append(message);
-			textArea.append("\n\n");
-		}
+		textArea.append(message);
+		textArea.append("\n");
 	}
 	
 	private class ChatClientThread extends Thread {
@@ -165,6 +142,7 @@ public class ChatWindow {
 					updateTextArea(data);
 				}
 			} catch (InterruptedException e) { 
+				ChatClientApp.log("error: " + e);
 			} catch (SocketException e) {
 				ChatClientApp.log("error: " + e);
 			} catch (IOException e) {

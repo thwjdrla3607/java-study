@@ -46,7 +46,7 @@ public class ChatClient {
 			
 			//ack 받기!!
 			String ack = br.readLine();
-			if("join: OK".equals(ack)) {
+			if("join:ok".equals(ack)) {
 				System.out.println(nickname + "님이 입장하였습니다.");
 			}
 			

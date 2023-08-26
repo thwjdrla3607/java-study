@@ -33,12 +33,15 @@ public class ChatClientApp {
 				
 				System.out.println("대화명은 한글자 이상 입력해야 합니다.\n");
 			}
+			// System.out.println("test");
 						
 			// 1. create socket 
 			socket = new Socket();
 			
 			// 2. connect server
 			socket.connect(new InetSocketAddress(SERVER_IP, PORT));
+			
+			
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true); // auto-flush
@@ -47,6 +50,7 @@ public class ChatClientApp {
 			pw.println("join:" + name); 
 			
 			String ack = br.readLine(); 
+			// System.out.println(ack);
 			if("join:ok".equals(ack)) { 
 				new ChatWindow(name, socket).show();
 			}
